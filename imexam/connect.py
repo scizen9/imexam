@@ -66,6 +66,10 @@ class Connect:
 
     """
 
+    # viewers report some keys by their X keysym name, map the ones
+    # used by the imexam options back to the character they represent
+    _keysym_map = {'question': '?'}
+
     def __init__(self, target=None, path=None, viewer="ds9",
                  wait_time=10, quit_window=True, port=None):
         """Initialize the imexam control object."""
@@ -240,6 +244,10 @@ class Connect:
                 # interface.
                 try:
                     x, y, current_key = self.readcursor()
+                    # ds9 returns the X keysym name for non-alphanumeric
+                    # keys, translate the ones we use back to the character
+                    current_key = self._keysym_map.get(current_key,
+                                                       current_key)
                     if current_key in ["Left", "Right", "Up", "Down"]:
                         if current_key == "Left":
                             x, y = x - 1, y
@@ -251,10 +259,10 @@ class Connect:
                             x, y = x, y + 1
                         self.cursor(x=x, y=y)
                     else:
-                        if current_key not in keys and 'q' not in current_key:
+                        if current_key not in keys and current_key != 'q':
                             self.exam._close_plots()
                         else:
-                            if 'q' in current_key:
+                            if current_key == 'q':
                                 current_key = None
                                 self.exam._close_plots()
                             else:

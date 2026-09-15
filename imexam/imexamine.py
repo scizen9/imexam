@@ -169,7 +169,8 @@ class Imexamine:
                                     'd': (self.com_center, 'Return the Center of Mass fit center of the object'),
                                     'w': (self.surface, 'Display a surface plot around the cursor location'),
                                     '2': (self.new_plot_window, 'Make the next plot in a new window'),
-                                    't': (self.cutout, 'Make a fits image cutout using pointer location')
+                                    't': (self.cutout, 'Make a fits image cutout using pointer location'),
+                                    '?': (self.print_options, 'Print this list')
                                     }
 
     def print_options(self):
@@ -195,8 +196,8 @@ class Imexamine:
 
         """
         self.log.debug(f"pressed: {key}, {self.imexam_option_funcs[key][0].__name__}")
-        # dont require input for saving the active figure
-        if key == 's':
+        # dont require input for saving the active figure or listing options
+        if key in ('s', '?'):
             self.imexam_option_funcs[key][0]()
         else:
             self.imexam_option_funcs[key][0](x, y, self._data)

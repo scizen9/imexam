@@ -499,7 +499,11 @@ class ginga_general:
         """
         data_x, data_y = self.ginga_view.get_last_data_xy()
 
-        if "q" not in keyname:
+        # ginga reports some keys by name, map them back to the
+        # character the imexam options are keyed on
+        keyname = {'question': '?'}.get(keyname, keyname)
+
+        if keyname != 'q':
             print(f"read: {keyname} at {data_x}, {data_y}")
         self.logger.debug(f"key {keyname} pressed at data {data_x},{data_y}")
 
@@ -532,12 +536,13 @@ class ginga_general:
 
             # call the imexam function directly
             self.logger.debug(f"calling examine function key={keyname}")
-            try:
-                method = self.exam.imexam_option_funcs[keyname][0]
-            except KeyError:
+            if keyname not in self.exam.imexam_option_funcs:
                 return False
+            self.exam.set_data(data)
             try:
-                method(data_x, data_y, data)
+                # do_option knows which functions don't take the cursor
+                # location, e.g. 's' and '?'
+                self.exam.do_option(data_x, data_y, keyname)
             except Exception as e:
                 self.logger.error(f"Failed examine function: {repr(e)}")
                 try:
