@@ -600,9 +600,9 @@ class Imexamine:
             sky_per_pix = 0.
             annulus_apertures = None
             if subsky:
-                annulus_apertures = photutils.CircularAnnulus(
+                annulus_apertures = photutils.aperture.CircularAnnulus(
                     (xx, yy), r_in=inner, r_out=outer)
-                bkgflux_table = photutils.aperture_photometry(
+                bkgflux_table = photutils.aperture.aperture_photometry(
                     data,
                     annulus_apertures)
 
@@ -1136,10 +1136,10 @@ class Imexamine:
         if subtract_background:
             inner = pars["skyrad"][0]
             width = pars["width"][0]
-            annulus_apertures = photutils.CircularAnnulus((centerx, centery),
+            annulus_apertures = photutils.aperture.CircularAnnulus((centerx, centery),
                                                           r_in=inner,
                                                           r_out=inner + width)
-            bkgflux_table = photutils.aperture_photometry(data,
+            bkgflux_table = photutils.aperture.aperture_photometry(data,
                                                           annulus_apertures)
 
             # to calculate the mean local background, divide the circular
