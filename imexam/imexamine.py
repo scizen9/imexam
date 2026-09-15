@@ -63,6 +63,7 @@ try:
     import photutils
     photutils_installed = True
     from photutils.centroids import centroid_com
+    import photutils.aperture
     # account for API change
     from packaging import version
     photutils_version = version.parse(photutils.__version__)
@@ -588,8 +589,8 @@ class Imexamine:
 
             outer = inner + width
 
-            apertures = photutils.CircularAperture((xx, yy), radius)
-            rawflux_table = photutils.aperture_photometry(
+            apertures = photutils.aperture.CircularAperture((xx, yy), radius)
+            rawflux_table = photutils.aperture.aperture_photometry(
                 data,
                 apertures,
                 subpixels=1,
@@ -958,7 +959,7 @@ class Imexamine:
         chunk = data[yy - delta:yy + delta, xx - delta:xx + delta]
 
         try:
-            xcenter, ycenter = centroid_com(chunk, oversampling=oversampling)
+            xcenter, ycenter = centroid_com(chunk)
 
             pstr = f"xc={(xcenter + xx - delta):.4f}\tyc={(ycenter + yy - delta):.4f}"
         except AttributeError:
@@ -1157,7 +1158,7 @@ class Imexamine:
                 sky_per_pix = 0.
                 self.log.info("Sky background negative, setting to zero")
             self.log.info(f"Background per pixel: {sky_per_pix}")
-            flux -= sky_per_pix
+            flux = flux - sky_per_pix
 
             if getdata:
                 self.log.info(f"Sky per pixel: {sky_per_pix} using "
@@ -1250,7 +1251,7 @@ class Imexamine:
 
             if fitplot:
                 ax.plot(fline, yfit, linestyle='-', c='r', label=fitform.name)
-                ax.set_xlim(0, datasize, 0.5)
+                ax.set_xlim(0, datasize)
                 ax.text(legendx, legendy, legend)
 
             ax.set_title(title)
@@ -1398,17 +1399,17 @@ class Imexamine:
             if data is None:
                 data = self._data
 
-            apertures = photutils.CircularAperture((x, y), radsize)
-            rawflux_table = photutils.aperture_photometry(
+            apertures = photutils.aperture.CircularAperture((x, y), radsize)
+            rawflux_table = photutils.aperture.aperture_photometry(
                 data,
                 apertures,
                 subpixels=1,
                 method="center")
 
             outer = sky_inner + skywidth
-            annulus_apertures = photutils.CircularAnnulus(
+            annulus_apertures = photutils.aperture.CircularAnnulus(
                 (x, y), r_in=sky_inner, r_out=outer)
-            bkgflux_table = photutils.aperture_photometry(
+            bkgflux_table = photutils.aperture.aperture_photometry(
                 data,
                 annulus_apertures)
 
@@ -1622,8 +1623,7 @@ class Imexamine:
         if fig is None:
             fig = plt.figure(self._figure_name)
         fig.clf()
-        fig.add_subplot(111)
-        ax = fig.gca(projection='3d')
+        ax = fig.add_subplot(111, projection='3d')
 
         title = self.surface_pars["title"][0]
         if title is None:

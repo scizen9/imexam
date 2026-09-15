@@ -21,7 +21,7 @@ try:
     from ginga import cmap
     from ginga.util import paths
     from ginga.util import wcsmod
-    wcsmod.use('AstropyWCS')
+    wcsmod.use('astropy')
 except ImportError:
     print("Ginga not installed, use other viewer, or no viewer")
 
@@ -117,9 +117,9 @@ class ginga_general:
             logger=self.logger)
 
         # general preferences shared with other ginga viewers
-        self.settings = self.prefs.createCategory('general')
+        self.settings = self.prefs.create_category('general')
         self.settings.load(onError='silent')
-        self.settings.setDefaults(useMatplotlibColormaps=False,
+        self.settings.set_defaults(useMatplotlibColormaps=False,
                                   autocuts='on', autocut_method='zscale')
 
         # add matplotlib colormaps to ginga's own set if user has this
@@ -134,11 +134,11 @@ class ginga_general:
                 print(f"Failed to load matplotlib colormaps: {repr(e)}")
 
         # bindings preferences shared with other ginga viewers
-        bind_prefs = self.prefs.createCategory('bindings')
+        bind_prefs = self.prefs.create_category('bindings')
         bind_prefs.load(onError='silent')
 
         # viewer preferences unique to imexam ginga viewers
-        viewer_prefs = self.prefs.createCategory('imexam')
+        viewer_prefs = self.prefs.create_category('imexam')
         viewer_prefs.load(onError='silent')
 
         # create the viewer specific to this backend
@@ -165,7 +165,7 @@ class ginga_general:
         self.canvas.enable_draw(False)
         self.canvas.add_callback('key-press', self._key_press_imexam)
         self.canvas.set_surface(self.ginga_view)
-        self.canvas.ui_setActive(True)
+        self.canvas.ui_set_active(True)
 
     def _create_viewer(self, bind_prefs, viewer_prefs):
         """Create backend-specific viewer."""
@@ -984,7 +984,6 @@ class ginga(ginga_general):
 
         self._server = ipg.make_server(host=self._host,
                                        port=self._port,
-                                       use_opencv=self.use_opencv,
                                        numthreads=self._threads)
 
         try:
